@@ -19,12 +19,12 @@
             {cardValue}
         </div>
     {/each} -->
-    <div class="table-art absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 flex items-center justify-center aspect-video border-8 rounded-full opacity-25 text-white text-8xl font-serif tracking-widest underline underline-offset-[16px]">
-        POKER
-        <div class="icon-wrapper absolute w-8 h-8">
+    <div class="table-art absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 flex items-center justify-center gap-4 aspect-video border-8 rounded-full opacity-25 text-white text-8xl font-serif tracking-widest underline underline-offset-[16px]">
+        <div class="icon-wrapper h-28">
             <CardsIcon/>
         </div>
-        <div class="icon-wrapper absolute w-8 h-8">
+        POKER
+        <div class="icon-wrapper h-28">
             <ChipsIcon/>
         </div>
     </div>
@@ -53,9 +53,4 @@
         bottom: 0.5rem;
         right: 0.5rem;
     } */
-
-    .icon-wrapper svg {
-        width: 100%;
-        height: 100%;
-    }
 </style>
