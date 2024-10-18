@@ -1,25 +1,7 @@
-const SUITS = ['SPADES', 'CLUBS', 'DIAMONDS', 'HEARTS'];
-const VALUES = [
-	{ face: '2', score: 1 },
-	{ face: '3', score: 2 },
-	{ face: '4', score: 3 },
-	{ face: '5', score: 4 },
-	{ face: '6', score: 5 },
-	{ face: '7', score: 6 },
-	{ face: '8', score: 7 },
-	{ face: '9', score: 8 },
-	{ face: '10', score: 9 },
-	{ face: 'J', score: 10 },
-	{ face: 'Q', score: 11 },
-	{ face: 'K', score: 12 },
-	{ face: 'A', score: 13 }
-]
+import { SUITS, VALUES } from "./constants"
 
-// import { SUITS, VALUES } from './constants'
-
-const generateDeck = () => {
+export const generateDeck = () => {
 	const DECK = []
-
 	// Loop through each suit and value to create the cards
 	SUITS.forEach(suit => {
 		VALUES.forEach(value => {
@@ -32,9 +14,10 @@ const generateDeck = () => {
 			DECK.push(card)
 		})
 	})
-
 	return DECK
 }
+// Generate the full deck
+// export const CARDS = generateDeck()
 
 // const shuffleDeck = (deck) => {
 // 	for (let i = deck.length - 1; i > 0; i--) {
@@ -45,5 +28,17 @@ const generateDeck = () => {
 // 	return deck;
 // };
 
-// Generate the full deck
-export const CARDS = generateDeck()
+export const getRandomCard = (deck) => {
+	// Return null if array is empty
+	if (deck.length === 0) {
+		return { selectedCard: null, newDeck: deck }
+	}
+	// Generate a random index
+	const randomIndex = Math.floor(Math.random() * deck.length);
+	// Get the random object from the array
+	const selectedCard = deck[randomIndex]
+	// Remove the selected card from the deck
+  	const newDeck = [...deck.slice(0, randomIndex), ...deck.slice(randomIndex + 1)]
+
+	return { selectedCard, newDeck }
+}

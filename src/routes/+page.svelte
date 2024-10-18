@@ -1,17 +1,20 @@
 <script>
     import CardsIcon from '../assets/icons/svg/poker-cards.svelte'
     import ChipsIcon from '../assets/icons/svg/poker-chips.svelte'
-    import { CARDS } from '../lib/cards';
+    import { generateDeck, getRandomCard } from '../lib/cards';
 
-    // const cardDeck = cards;
+    const CARD_DECK = generateDeck()
     // const discardPile = [];
     // const board = [];
     // const hand1 = [];
     // const hand2 = [];
+    
+    const rand = getRandomCard(CARD_DECK)
+    console.log(rand)
 </script>
 
 <div class="poker-table relative w-screen h-screen overflow-hidden flex flex-wrap gap-3 bg-green-700">
-    {#each CARDS as { id, cardSuit, cardFace, cardScore }, i}
+    {#each CARD_DECK as { id, cardSuit, cardFace, cardScore }, i}
         <div
         id="{id}"
         class="card {cardSuit} relative w-24 h-36 flex justify-center items-center bg-slate-50 rounded-md border-black border-2 shadow-xl font-sans font-bold text-6xl"
