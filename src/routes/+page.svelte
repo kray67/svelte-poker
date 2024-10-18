@@ -1,18 +1,24 @@
 <script>
     import CardsIcon from '../assets/icons/svg/poker-cards.svelte'
     import ChipsIcon from '../assets/icons/svg/poker-chips.svelte'
-    import { generateDeck, getRandomCard } from '../lib/cards';
+    import { slide } from 'svelte/transition'
+    import { generateDeck, getRandomCard } from '../lib/helperFns'
+    import { NUMBER_OF_PLAYERS, CARDS_PER_PLAYER } from "../lib/constants"
 
     let CARD_DECK = generateDeck()
     let BOARD_CARDS = []
     let DISCARD_PILE = []
-    let HAND_1 = []
+    let PLAYERS = []
     let DRAW_STAGE = 1
 
     const dealCards = () => {
         if (DRAW_STAGE === 1) {
-            dealCardToPlayer()
-            dealCardToPlayer()
+            dealCardsToPlayers()
+            DRAW_STAGE++
+            return
+        }
+
+        if (DRAW_STAGE === 2) {
             burnCard()
             dealCardToBoard()
             dealCardToBoard()
@@ -21,43 +27,59 @@
             return
         }
 
-        if (DRAW_STAGE === 2 || DRAW_STAGE === 3) {
+        if (DRAW_STAGE === 3 || DRAW_STAGE === 4) {
             burnCard()
             dealCardToBoard()
             DRAW_STAGE++
             return
         }
 
-        if (DRAW_STAGE === 4) return
+        if (DRAW_STAGE === 5) return
     }
 
     const dealCardToBoard = () => {
-        let TEMP_BOARD = BOARD_CARDS
+        let TEMP_CARDS = BOARD_CARDS
         if (BOARD_CARDS.length === 5) return
         const { selectedCard, newDeck } = getRandomCard(CARD_DECK)
-        TEMP_BOARD.push(selectedCard)
+        TEMP_CARDS.push(selectedCard)
 
-        BOARD_CARDS = TEMP_BOARD
+        BOARD_CARDS = TEMP_CARDS
         CARD_DECK = newDeck
     }
 
-    const dealCardToPlayer = () => {
-        let TEMP_BOARD = HAND_1
-        if (HAND_1.length === 2) return
-        const { selectedCard, newDeck } = getRandomCard(CARD_DECK)
-        TEMP_BOARD.push(selectedCard)
+    const dealCardsToPlayers = () => {
+        if (NUMBER_OF_PLAYERS > 0 && PLAYERS.length === 0) buildPlayers()
 
-        HAND_1 = TEMP_BOARD
-        CARD_DECK = newDeck
+        while (PLAYERS.some(player => player.playerHand.length < CARDS_PER_PLAYER)) {
+            for (let i = 0; i < PLAYERS.length; i++) {
+                if (PLAYERS[i].playerHand.length < CARDS_PER_PLAYER) {
+                    let TEMP_CARDS = PLAYERS[i].playerHand
+                    const { selectedCard, newDeck } = getRandomCard(CARD_DECK)
+                    TEMP_CARDS.push(selectedCard)
+                    PLAYERS[i].playerHand = TEMP_CARDS
+                    CARD_DECK = newDeck
+                }
+            }
+        }
     }
 
     const burnCard = () => {
-        let TEMP_BOARD = DISCARD_PILE
+        let TEMP_CARDS = DISCARD_PILE
         const { selectedCard, newDeck } = getRandomCard(CARD_DECK)
-        TEMP_BOARD.push(selectedCard)
+        TEMP_CARDS.push(selectedCard)
 
-        DISCARD_PILE = TEMP_BOARD
+        DISCARD_PILE = TEMP_CARDS
         CARD_DECK = newDeck
+    }
+
+    const buildPlayers = () => {
+        const TEMP_PLAYERS = []
+        for (let index = 1; index <= NUMBER_OF_PLAYERS; index++) {
+            TEMP_PLAYERS.push(
+                { playerID: `PLAYER_${index}`, playerHand: [] }
+            )
+        }
+        PLAYERS = TEMP_PLAYERS
     }
 
     const resetAll = () => {
@@ -65,8 +87,11 @@
         CARD_DECK = generateDeck()
         BOARD_CARDS = []
         DISCARD_PILE = []
-        HAND_1 = []
+        PLAYERS = []
+        buildPlayers()
     }
+
+    buildPlayers()
 </script>
 
 <div class="poker-table relative w-screen h-screen overflow-hidden flex items-center justify-center flex-wrap p-12 bg-green-700">
@@ -79,46 +104,62 @@
             on:click={resetAll}
             class="deal-btn max-h-8 max-w-16 flex items-center justify-center rounded-lg py-6 px-16 bg-white text-xl font-bold shadow-md">RESET</button>
         </div>
+
         <!-- BOARD CARDS -->
-        <div class="board-cards h-36 flex items-center justify-center gap-3">
-            BOARD
-            {#each BOARD_CARDS as { id, cardSuit, cardFace, cardScore } (id)}
-                <div
-                id="{id}"
-                class="card {cardSuit} relative w-24 h-36 flex justify-center items-center bg-slate-50 rounded-md border-black border-2 shadow-xl font-sans font-bold text-6xl"
-                style="--backgroundImage: url(../src/assets/icons/card-suits/{cardSuit}.png)"
-                data-score="{cardScore}">
-                    {cardFace}
+        <div class="board-cards h-36 flex flex-col items-center justify-center gap-3">
+            <h1 class="text-xl font-bold">BOARD</h1>
+            <div class="cards-wrapper flex items-center justify-center gap-3">
+                {#each BOARD_CARDS as { id, cardSuit, cardFace, cardScore } (id)}
+                    <div
+                    transition:slide
+                    id="{id}"
+                    class="card {cardSuit} relative w-24 h-36 flex justify-center items-center bg-slate-50 rounded-md border-black border-2 shadow-xl font-sans font-bold text-6xl"
+                    style="--backgroundImage: url(../src/assets/icons/card-suits/{cardSuit}.png)"
+                    data-score="{cardScore}">
+                        {cardFace}
+                    </div>
+                {/each}
+            </div>
+        </div>
+
+        <!-- PLAYERS -->
+         <div class="players-wrapper w-full flex items-center justify-between gap-12">
+            {#each PLAYERS as { playerID, playerHand } (playerID)}
+                <!-- PLAYER CARDS -->
+                <div class="board-cards flex flex-col items-center justify-center gap-3">
+                    <h1 class="text-xl font-bold">{playerID}</h1>
+                    <div class="cards-wrapper h-36 flex items-center justify-center gap-3">
+                        {#each playerHand as { id, cardSuit, cardFace, cardScore } (id)}
+                            <div
+                            transition:slide
+                            id="{id}"
+                            class="card card-small {cardSuit} relative w-16 h-2/3 flex justify-center items-center bg-slate-50 rounded-md border-black border-2 shadow-xl font-sans font-bold text-5xl"
+                            style="--backgroundImage: url(../src/assets/icons/card-suits/{cardSuit}.png)"
+                            data-score="{cardScore}">
+                                {cardFace}
+                            </div>
+                        {/each}
+                    </div>
                 </div>
             {/each}
-        </div>
-        <!-- PLAYER CARDS -->
-        <div class="player-cards h-36 flex items-center justify-center gap-3">
-            PLAYER
-            {#each HAND_1 as { id, cardSuit, cardFace, cardScore } (id)}
-                <div
-                id="{id}"
-                class="card {cardSuit} relative w-24 h-36 flex justify-center items-center bg-slate-50 rounded-md border-black border-2 shadow-xl font-sans font-bold text-6xl"
-                style="--backgroundImage: url(../src/assets/icons/card-suits/{cardSuit}.png)"
-                data-score="{cardScore}">
-                    {cardFace}
-                </div>
-            {/each}
-        </div>
+         </div>
+
         <!-- DISCARD CARDS -->
-        <div class="discard-cards h-36 flex items-center justify-center gap-3">
+        <!-- <div class="discard-cards h-36 flex items-center justify-center gap-3">
             DISCARD
             {#each DISCARD_PILE as { id, cardSuit, cardFace, cardScore } (id)}
                 <div
+                transition:slide
                 id="{id}"
-                class="card {cardSuit} relative w-24 h-36 flex justify-center items-center bg-slate-50 rounded-md border-black border-2 shadow-xl font-sans font-bold text-6xl"
+                class="card card-small {cardSuit} relative w-16 h-2/3 flex justify-center items-center bg-slate-50 rounded-md border-black border-2 shadow-xl font-sans font-bold text-5xl"
                 style="--backgroundImage: url(../src/assets/icons/card-suits/{cardSuit}.png)"
                 data-score="{cardScore}">
                     {cardFace}
                 </div>
             {/each}
-        </div>
+        </div> -->
     </div>
+
     <div class="table-art absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 flex items-center justify-center gap-4 aspect-video border-8 rounded-full opacity-25 text-white text-8xl font-serif tracking-widest underline underline-offset-[16px]">
         <div class="icon-wrapper h-28">
             <CardsIcon/>
@@ -152,5 +193,21 @@
     .card::after {
         bottom: 0.5rem;
         right: 0.5rem;
+    }
+
+    .card-small::before,
+    .card-small::after {
+        width: 1.15rem;
+        height: 1.15rem;
+    }
+
+    .card-small::before {
+        top: 0.25rem;
+        left: 0.25rem;
+    }
+
+    .card-small::after {
+        bottom: 0.25rem;
+        right: 0.25rem;
     }
 </style>

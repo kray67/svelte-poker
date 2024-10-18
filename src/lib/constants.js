@@ -14,3 +14,5 @@ export const VALUES = [
 	{ face: 'K', score: 12 },
 	{ face: 'A', score: 13 }
 ]
+export const NUMBER_OF_PLAYERS = 5
+export const CARDS_PER_PLAYER = 2
