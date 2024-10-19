@@ -1,4 +1,9 @@
-export const SUITS = ['SPADES', 'CLUBS', 'DIAMONDS', 'HEARTS']
+export const SUITS = [
+	{ suit: 'SPADES', img: '../src/assets/icons/card-suits/SPADES.png'},
+	{ suit: 'CLUBS', img: '../src/assets/icons/card-suits/CLUBS.png'},
+	{ suit: 'DIAMONDS', img: '../src/assets/icons/card-suits/DIAMONDS.png'},
+	{ suit: 'HEARTS', img: '../src/assets/icons/card-suits/HEARTS.png'}
+]
 export const VALUES = [
 	{ face: '2', score: 1 },
 	{ face: '3', score: 2 },
@@ -16,3 +21,6 @@ export const VALUES = [
 ]
 export const NUMBER_OF_PLAYERS = 5
 export const CARDS_PER_PLAYER = 2
+
+export const CARD_WIDTH = '6'
+export const CARD_SMALL_WIDTH = '4'
