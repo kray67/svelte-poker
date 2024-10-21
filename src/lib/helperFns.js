@@ -88,7 +88,7 @@ const checkForFlush = (hand) => {
 				if (card.cardScore > highCard) highCard = card.cardScore
 			})
 			
-			return { score: (500 + parseFloat(highCard)), text: `${suit} Flush`, value: FLUSH_CARDS }
+			return { score: (500 + parseFloat(highCard)), text: `${highCard.cardFace} High ${suit} Flush`, value: FLUSH_CARDS }
 		}
 	}
 
