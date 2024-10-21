@@ -16,14 +16,15 @@ class="card-group flex flex-col items-center justify-center gap-3">
     <div
     class="cards-wrapper h-36 flex items-center justify-start gap-3"
     style="width: {WRAPPER_WIDTH}">
-        {#each cards as { cardID, cardSuit, cardFace, cardScore, bgImg } (cardID)}
+        {#each cards as { cardID, cardSuit, cardFace, cardScore, bgImg, delay } (cardID)}
             <Card
             cardID="{cardID}"
             cardFace="{cardFace}"
             cardSuit="{cardSuit}"
             cardScore="{cardScore}"
             bgImg="{bgImg}"
-            isSmall="{smallCards}" />
+            isSmall="{smallCards}"
+            delay="{delay}" />
         {/each}
     </div>
 </div>

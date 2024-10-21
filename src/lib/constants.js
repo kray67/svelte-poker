@@ -5,21 +5,21 @@ export const SUITS = [
 	{ suit: 'HEARTS', img: '../src/assets/icons/card-suits/HEARTS.png'}
 ]
 export const VALUES = [
-	{ face: '2', score: 1 },
-	{ face: '3', score: 2 },
-	{ face: '4', score: 3 },
-	{ face: '5', score: 4 },
-	{ face: '6', score: 5 },
-	{ face: '7', score: 6 },
-	{ face: '8', score: 7 },
-	{ face: '9', score: 8 },
-	{ face: '10', score: 9 },
-	{ face: 'J', score: 10 },
-	{ face: 'Q', score: 11 },
-	{ face: 'K', score: 12 },
-	{ face: 'A', score: 13 }
+	{ face: '2', score: 2 },
+	{ face: '3', score: 3 },
+	{ face: '4', score: 4 },
+	{ face: '5', score: 5 },
+	{ face: '6', score: 6 },
+	{ face: '7', score: 7 },
+	{ face: '8', score: 8 },
+	{ face: '9', score: 9 },
+	{ face: '10', score: 10 },
+	{ face: 'J', score: 11 },
+	{ face: 'Q', score: 12 },
+	{ face: 'K', score: 13 },
+	{ face: 'A', score: 14 }
 ]
-export const NUMBER_OF_PLAYERS = 5
+export const NUMBER_OF_PLAYERS = 8
 export const CARDS_PER_PLAYER = 2
 
 export const CARD_WIDTH = '6'

@@ -1,5 +1,5 @@
 <script>
-    import { slide } from 'svelte/transition'
+    import { fly } from 'svelte/transition'
 
     export let cardID
     export let cardFace
@@ -7,10 +7,16 @@
     export let cardScore
     export let bgImg
     export let isSmall
+    export let delay
+
+    const flyParams = {
+        delay: delay,
+        y: 500
+    }
 </script>
 
 <div
-transition:slide
+transition:fly={flyParams}
 id="{cardID}"
 class="card {cardSuit} {isSmall ? 'card-small w-16 h-2/3 text-5xl' : 'w-24 h-36 text-6xl'} relative flex justify-center items-center bg-slate-50 rounded-md border-black border-2 shadow-xl font-sans font-bold"
 style="--backgroundImage: url({bgImg})"

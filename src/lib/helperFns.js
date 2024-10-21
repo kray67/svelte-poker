@@ -10,7 +10,8 @@ export const generateDeck = () => {
 				cardSuit: suit.suit,
 				cardFace: value.face,
 				cardScore: value.score,
-				bgImg: suit.img
+				bgImg: suit.img,
+				delay: 0
 			}
 			DECK.push(card)
 		})
@@ -51,56 +52,143 @@ export const getWinningHand = (players, board) => {
 
 const evaluateHand = (hand) => {
 	const WITH_REPEATS = checkForRepeats(hand)
-	if (WITH_REPEATS) {
-		return WITH_REPEATS
+	const WITH_FLUSH = checkForFlush(hand)
+	const WITH_STRAIGHT = checkForStraight(hand)
+	// Four of a kind
+	if (WITH_REPEATS && WITH_REPEATS.score >= 600) return WITH_REPEATS
+	// Flush
+	if (WITH_FLUSH) return WITH_FLUSH
+	// Straight
+	if (WITH_STRAIGHT) return WITH_STRAIGHT
+	// Three of a Kind / Two Pairs / One Pair
+	if (WITH_REPEATS) return WITH_REPEATS
+	// High Card
+	return checkForHighCard(hand)
+}
+
+const checkForFlush = (hand) => {
+	const CARD_SUIT_COUNT = {}
+	hand.forEach(card => {
+		const SUIT = card.cardSuit
+		if (CARD_SUIT_COUNT[SUIT]) {
+			CARD_SUIT_COUNT[SUIT]++
+		} else {
+			CARD_SUIT_COUNT[SUIT] = 1
+		}
+	})
+
+	// Check for a Flush
+	for (const suit in CARD_SUIT_COUNT) {
+		if (CARD_SUIT_COUNT[suit] > 4) {
+			// Filter flush cards
+			const FLUSH_CARDS = hand.filter((card) => card.cardSuit === suit)
+			// Get high card
+			let highCard = 0
+			FLUSH_CARDS.forEach(card => {
+				if (card.cardScore > highCard) highCard = card.cardScore
+			})
+			
+			return { score: (500 + parseFloat(highCard)), text: `${suit} Flush`, value: FLUSH_CARDS }
+		}
 	}
-	return { score: 0 }
+
+	return null
+}
+
+const checkForStraight = (hand) => {
+	// Sort the array and remove duplicates
+	const SORTED_CARDS = [...new Set(hand)].sort((a, b) => a.cardScore - b.cardScore)
+
+	// Check for at least 5 consecutive numbers
+	let STRAIGHT_CARDS = []
+
+	for (let i = 0; i < SORTED_CARDS.length - 1; i++) {
+		if (STRAIGHT_CARDS.length === 0) {
+			// if it is the first card, push to array
+			STRAIGHT_CARDS.push(SORTED_CARDS[i])
+		} else {
+			if (SORTED_CARDS[i].cardScore === SORTED_CARDS[i - 1].cardScore + 1) {
+				// if it is the card immediately after the last, push to array
+				STRAIGHT_CARDS.push(SORTED_CARDS[i])
+			} else {
+				// if not, empty array and push to array
+				STRAIGHT_CARDS = []
+				STRAIGHT_CARDS.push(SORTED_CARDS[i])
+			}
+		}
+	}
+
+	if (STRAIGHT_CARDS >= 5) {
+		// Get high card
+		let highCard = { cardScore: 0 }
+		STRAIGHT_CARDS.forEach(card => {
+			if (card.cardScore > highCard) highCard = card
+		})
+		return { score: (400 + parseFloat(highCard.cardScore)), text: `${highCard.cardFace} High Straight`, value: STRAIGHT_CARDS }
+	}
+
+	return null
 }
 
 const checkForRepeats = (hand) => {
-	const CARD_FACE_COUNT = {}
+	const CARD_SCORE_COUNT = {}
 	hand.forEach(card => {
-		const FACE = card.cardFace
-		if (CARD_FACE_COUNT[FACE]) {
-			CARD_FACE_COUNT[FACE]++
+		const SCORE = card.cardScore
+		if (CARD_SCORE_COUNT[SCORE]) {
+			CARD_SCORE_COUNT[SCORE]++
 		} else {
-			CARD_FACE_COUNT[FACE] = 1
+			CARD_SCORE_COUNT[SCORE] = 1
 		}
 	})
 
 	let PAIRS = []
 
 	// Check for Four of a Kind
-	for (const face in CARD_FACE_COUNT) {
-		if (CARD_FACE_COUNT[face] === 4) {
-			return { score: 400, text: "Four of a Kind", value: face }
+	for (const score in CARD_SCORE_COUNT) {
+		if (CARD_SCORE_COUNT[score] === 4) {
+			const CARD = hand.find(card => card.cardScore === parseFloat(score))
+			return { score: (700 + parseFloat(score)), text: "Four of a Kind", value: CARD }
 		}
 	}
 
 	// Check for Three of a Kind
-	for (const face in CARD_FACE_COUNT) {
-		if (CARD_FACE_COUNT[face] === 3) {
-			return { score: 300, text: "Three of a Kind", value: face }
+	for (const score in CARD_SCORE_COUNT) {
+		if (CARD_SCORE_COUNT[score] === 3) {
+			const CARD = hand.find(card => card.cardScore === parseFloat(score))
+			return { score: (300 + parseFloat(score)), text: "Three of a Kind", value: CARD }
 		}
 	}
 
 	// Check for Two Pairs and One Pair
-	for (const face in CARD_FACE_COUNT) {
-		if (CARD_FACE_COUNT[face] === 2) {
-			PAIRS.push(face)
+	for (const score in CARD_SCORE_COUNT) {
+		if (CARD_SCORE_COUNT[score] === 2) {
+			PAIRS.push(score)
 		}
 	}
 
 	// If there are two pairs, return "Two Pairs"
 	if (PAIRS.length === 2) {
-		return { score: 200, text: "Two Pairs", values: PAIRS }
+		let highestScore = 0
+		for (let i = 0; i < PAIRS.length; i++) {
+			if (parseFloat(PAIRS[i]) > highestScore) highestScore = parseFloat(PAIRS[i])
+		}
+		return { score: (200 + highestScore), text: "Two Pairs", values: PAIRS }
 	}
 
 	// If there is one pair, return "One Pair"
 	if (PAIRS.length === 1) {
-		return { score: 100, text: "One Pair", value: PAIRS[0] }
+		const CARD = hand.find(card => card.cardScore === parseFloat(PAIRS[0]))
+		return { score: (100 + parseFloat(PAIRS[0])), text: "One Pair", value: CARD }
 	}
 
 	// If none of the conditions match, return null
 	return null
+}
+
+const checkForHighCard = (hand) => {
+	let highCard = 0
+	hand.forEach(card => {
+		if (card.cardScore > highCard) highCard = card.cardScore
+	})
+	return { score: parseFloat(highCard), text: "High Card", value: highCard }
 }

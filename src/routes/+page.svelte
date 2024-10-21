@@ -59,14 +59,18 @@
     }
 
     const dealCardsToPlayers = () => {
+        let CARD_DELAY = 0
         if (NUMBER_OF_PLAYERS > 0 && PLAYERS.length === 0) buildPlayers()
         while (PLAYERS.some(player => player.playerHand.length < CARDS_PER_PLAYER)) {
             for (let i = 0; i < PLAYERS.length; i++) {
                 if (PLAYERS[i].playerHand.length < CARDS_PER_PLAYER) {
                     const { selectedCard, newDeck } = getRandomCard(CARD_DECK)
+                    selectedCard.delay = CARD_DELAY
+                    // console.log(selectedCard)
                     PLAYERS[i].playerHand.push(selectedCard)
                     PLAYERS[i].playerHand = PLAYERS[i].playerHand
                     CARD_DECK = newDeck
+                    CARD_DELAY = CARD_DELAY + 100
                 }
             }
         }
