@@ -6,6 +6,7 @@
     export let label
     export let cards
     export let smallCards
+    export let score
 
     const WRAPPER_WIDTH = `${numberOfCards * (smallCards ? CARD_SMALL_WIDTH : CARD_WIDTH) + ((numberOfCards - 1) * 0.75)}rem`
 </script>
@@ -27,6 +28,9 @@ class="card-group flex flex-col items-center justify-center gap-3">
             delay="{delay}" />
         {/each}
     </div>
+    {#if score && score.text}
+        <div class="score">{score.text}</div>
+    {/if}
 </div>
 
 <style></style>

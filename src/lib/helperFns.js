@@ -34,20 +34,14 @@ export const getRandomCard = (deck) => {
 	return { selectedCard, newDeck }
 }
 
-export const getWinningHand = (players, board) => {
-	let CURRENT_HIGHSCORE = 0
-	let WINNER_HAND = { player: null, hand: 0 }
-	for (let i = 0; i < players.length; i++) {
-		const CURRENT_PLAYER = players[i]
-		const COMPLETE_PLAYER_HAND = CURRENT_PLAYER.playerHand.concat(board)
-		const SCORED_HAND = evaluateHand(COMPLETE_PLAYER_HAND)
-		if (SCORED_HAND.score > CURRENT_HIGHSCORE) {
-			CURRENT_HIGHSCORE = SCORED_HAND.score
-			WINNER_HAND = { player: CURRENT_PLAYER, score: SCORED_HAND }
-		}
-	}
+export const getHandScores = (players, board) => {
+	players.map(player => {
+		const COMPLETE_PLAYER_HAND = player.playerHand.concat(board)
+		const SCORED_PLAYER_HAND = evaluateHand(COMPLETE_PLAYER_HAND)
+		player.playerScore = SCORED_PLAYER_HAND
+	})
 
-	return WINNER_HAND
+	return players
 }
 
 const evaluateHand = (hand) => {
@@ -83,12 +77,12 @@ const checkForFlush = (hand) => {
 			// Filter flush cards
 			const FLUSH_CARDS = hand.filter((card) => card.cardSuit === suit)
 			// Get high card
-			let highCard = 0
+			let highCard = { cardScore: 0 }
 			FLUSH_CARDS.forEach(card => {
-				if (card.cardScore > highCard) highCard = card.cardScore
+				if (card.cardScore > highCard.cardScore) highCard = card
 			})
 			
-			return { score: (500 + parseFloat(highCard)), text: `${highCard.cardFace} High ${suit} Flush`, value: FLUSH_CARDS }
+			return { score: (500 + parseFloat(highCard.cardScore)), text: `${highCard.cardFace} High ${suit} Flush`, value: FLUSH_CARDS }
 		}
 	}
 
@@ -122,7 +116,7 @@ const checkForStraight = (hand) => {
 		// Get high card
 		let highCard = { cardScore: 0 }
 		STRAIGHT_CARDS.forEach(card => {
-			if (card.cardScore > highCard) highCard = card
+			if (card.cardScore > highCard.cardScore) highCard = card
 		})
 		return { score: (400 + parseFloat(highCard.cardScore)), text: `${highCard.cardFace} High Straight`, value: STRAIGHT_CARDS }
 	}

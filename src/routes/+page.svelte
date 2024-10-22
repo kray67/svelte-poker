@@ -2,7 +2,7 @@
     import CardGroup from '../components/cardGroup.svelte'
     import CardsIcon from '../assets/icons/svg/poker-cards.svelte'
     import ChipsIcon from '../assets/icons/svg/poker-chips.svelte'
-    import { generateDeck, getRandomCard, getWinningHand } from '../lib/helperFns'
+    import { generateDeck, getRandomCard, getHandScores } from '../lib/helperFns'
     import { NUMBER_OF_PLAYERS, CARDS_PER_PLAYER } from "../lib/constants"
 
     let CARD_DECK = generateDeck()
@@ -43,8 +43,9 @@
             return
         }
         if (DRAW_STAGE === 5) {
-            const results = getWinningHand(PLAYERS, BOARD_CARDS)
+            const results = getHandScores(PLAYERS, BOARD_CARDS)
             console.log(results)
+            PLAYERS = results
             DRAW_STAGE++
             return
         }
@@ -66,7 +67,6 @@
                 if (PLAYERS[i].playerHand.length < CARDS_PER_PLAYER) {
                     const { selectedCard, newDeck } = getRandomCard(CARD_DECK)
                     selectedCard.delay = CARD_DELAY
-                    // console.log(selectedCard)
                     PLAYERS[i].playerHand.push(selectedCard)
                     PLAYERS[i].playerHand = PLAYERS[i].playerHand
                     CARD_DECK = newDeck
@@ -86,7 +86,7 @@
     const buildPlayers = () => {
         for (let index = 1; index <= NUMBER_OF_PLAYERS; index++) {
             PLAYERS.push(
-                { playerID: `PLAYER_${index}`, playerHand: [] }
+                { playerID: `PLAYER_${index}`, playerHand: [], playerScore: null }
             )
         }
         PLAYERS = PLAYERS
@@ -130,12 +130,13 @@
 
         <!-- PLAYERS -->
         <div class="players-wrapper w-full flex items-center justify-between gap-12">
-            {#each PLAYERS as { playerID, playerHand } (playerID)}
+            {#each PLAYERS as { playerID, playerHand, playerScore } (playerID)}
                 <CardGroup
                 numberOfCards="{2}"
                 label="{playerID}"
                 cards="{playerHand}"
-                smallCards="{true}" />
+                smallCards="{true}"
+                score="{playerScore}" />
             {/each}
         </div>
     </div>
