@@ -2,7 +2,8 @@
     import CardGroup from '../components/cardGroup.svelte'
     import CardsIcon from '../assets/icons/svg/poker-cards.svelte'
     import ChipsIcon from '../assets/icons/svg/poker-chips.svelte'
-    import { generateDeck, getRandomCard, getHandScores } from '../lib/helperFns'
+    import { generateDeck, getRandomCard } from '../lib/cardGeneration'
+    import { getHandScores } from '../lib/handScoring'
     import { NUMBER_OF_PLAYERS, CARDS_PER_PLAYER } from "../lib/constants"
 
     let CARD_DECK = generateDeck()
