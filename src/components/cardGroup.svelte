@@ -38,8 +38,12 @@ style="width: {WRAPPER_WIDTH}">
     </div>
     <div class="score text-center text-balance h-12">{score && score.text ? score.text : ''}</div>
     {#if isWinner}
-        <div in:fly={flyParams} class="winner-text absolute text-2xl font-bold text-yellow-500 -translate-y-32 rotate-3 bg-slate-200 p-2 rounded-lg">WINNER!</div>
+        <div in:fly={flyParams} class="winner-text absolute text-2xl font-bold text-[gold] -translate-y-32 rotate-3 bg-slate-800 py-2 px-4 rounded-lg shadow-xl">WINNER!</div>
     {/if}
 </div>
 
-<style></style>
+<style>
+    .winner-text {
+        text-shadow: red 2px 0 0;
+    }
+</style>

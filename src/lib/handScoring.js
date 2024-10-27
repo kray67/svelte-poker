@@ -4,9 +4,22 @@ const VALUES_CONST = VALUES
 export const getHandScores = (players, board) => {
 	let highScore = 0
 	players.map(player => {
-		const COMPLETE_PLAYER_HAND = player.playerHand.concat(board)
-		const SCORED_PLAYER_HAND = evaluateHand(COMPLETE_PLAYER_HAND)
+		const COMPLETE_PLAYER_HAND = player.playerHand.concat(board);
+		const SCORED_PLAYER_HAND = evaluateHand(COMPLETE_PLAYER_HAND);
+
+		// Sort COMPLETE_PLAYER_HAND
+		let SORTED_COMPLETE_PLAYER_HAND = [...new Set(COMPLETE_PLAYER_HAND)].sort((a, b) => b.cardScore - a.cardScore)
+
+		let PLAYER_SORTED_FINAL_HAND_LENGTH = 0
+		let PLAYER_CARDS_SUMMED_VALUE = 0
+		SORTED_COMPLETE_PLAYER_HAND.forEach((card) => {
+			if (PLAYER_SORTED_FINAL_HAND_LENGTH === 5) return;
+			PLAYER_CARDS_SUMMED_VALUE += card.cardScore;
+			PLAYER_SORTED_FINAL_HAND_LENGTH++;
+		});
+
 		player.playerScore = SCORED_PLAYER_HAND
+		player.playerScore.score += PLAYER_CARDS_SUMMED_VALUE
 		if (player.playerScore.score > highScore) highScore = player.playerScore.score
 	})
 
@@ -29,8 +42,18 @@ const evaluateHand = (hand) => {
 		// Check if hand also has a straight
 		if (WITH_STRAIGHT) {
 			// Check if it is a Royal straight
-			if (WITH_STRAIGHT.highCard.cardFace === 'A') return { score: (800 + parseFloat(WITH_STRAIGHT.highCard.cardText)), text: `${WITH_FLUSH.suit} Royal Straight Flush`, value: WITH_FLUSH.value }
-			return { score: (700 + parseFloat(WITH_STRAIGHT.highCard.cardScore)), text: `${WITH_STRAIGHT.highCard.cardText} High ${WITH_FLUSH.suit} Straight Flush`, value: WITH_FLUSH.value }
+			if (WITH_STRAIGHT.highCard.cardFace === 'A') {
+				return {
+					score: (8000000 + parseFloat(WITH_STRAIGHT.highCard.cardScore)),
+					text: `${WITH_FLUSH.suit} Royal Straight Flush`,
+					value: WITH_FLUSH.value
+				}
+			}
+			return { 
+				score: (8000000 + parseFloat(WITH_STRAIGHT.highCard.cardScore)), 
+				text: `${WITH_STRAIGHT.highCard.cardText} High ${WITH_FLUSH.suit} Straight Flush`, 
+				value: WITH_FLUSH.value 
+			}
 		} 
 		return WITH_FLUSH
 	}
@@ -64,7 +87,12 @@ const checkForFlush = (hand) => {
 				if (card.cardScore > highCard.cardScore) highCard = card
 			})
 			
-			return { score: (500 + parseFloat(highCard.cardScore)), text: `${highCard.cardText} High ${suit} Flush`, value: FLUSH_CARDS, suit: suit }
+			return {
+				score: (5000000 + parseFloat(highCard.cardScore)),
+				text: `${highCard.cardText} High ${suit} Flush`,
+				value: FLUSH_CARDS,
+				suit: suit
+			}
 		}
 	}
 
@@ -109,7 +137,12 @@ const checkForStraight = (hand) => {
 		STRAIGHT_CARDS.forEach(card => {
 			if (card.cardScore > highCard.cardScore) highCard = card
 		})
-		return { score: (400 + parseFloat(highCard.cardScore)), text: `${highCard.cardText} High Straight`, value: STRAIGHT_CARDS, highCard: highCard }
+		return {
+			score: (4000000 + parseFloat(highCard.cardScore)),
+			text: `${highCard.cardText} High Straight`,
+			value: STRAIGHT_CARDS,
+			highCard: highCard
+		}
 	}
 
 	return null
@@ -132,7 +165,11 @@ const checkForRepeats = (hand) => {
 	for (const score in CARD_SCORE_COUNT) {
 		if (CARD_SCORE_COUNT[score] === 4) {
 			const CARD = hand.find(card => card.cardScore === parseFloat(score))
-			return { score: (700 + parseFloat(score)), text: `Four ${CARD.cardPlural}`, value: CARD }
+			return {
+				score: (7000000 + parseFloat(score)),
+				text: `Four ${CARD.cardPlural}`,
+				value: CARD
+			}
 		}
 	}
 
@@ -151,9 +188,17 @@ const checkForRepeats = (hand) => {
 			const CARD = hand.find(card => card.cardScore === parseFloat(score))
 			// check if hand also has a pair and return Full House
 			if (PAIRS.length) {
-				return { score: (600 + parseFloat(score)), text: `${CARD.cardPlural} Full of ${PAIRS[0].plural}`, value: [CARD, PAIRS[0]] }
+				return {
+					score: (6000000 + CARD.cardScore + PAIRS[0].score),
+					text: `${CARD.cardPlural} Full of ${PAIRS[0].plural}`,
+					value: [CARD, PAIRS[0]]
+				}
 			}
-			return { score: (300 + parseFloat(score)), text: `Trip ${CARD.cardPlural}`, value: CARD }
+			return {
+				score: (3000000 + CARD.cardScore),
+				text: `Trip ${CARD.cardPlural}`,
+				value: CARD
+			}
 		}
 	}
 	
@@ -168,13 +213,21 @@ const checkForRepeats = (hand) => {
         for (let i = 0; i < NEW_PAIRS.length; i++) {
 			if (NEW_PAIRS[i].score > secondHighestPair.score) secondHighestPair = NEW_PAIRS[i]
 		}
-		return { score: (200 + highestPair.score + secondHighestPair.score), text: `Two Pairs: ${highestPair.plural} and ${secondHighestPair.plural}`, values: PAIRS }
+		return {
+			score: (2000000 + highestPair.score + secondHighestPair.score),
+			text: `Two Pairs: ${highestPair.plural} and ${secondHighestPair.plural}`,
+			values: PAIRS
+		}
 	}
 
 	// If there is one pair, return "One Pair"
 	if (PAIRS.length === 1) {
 		const CARD = hand.find(card => card.cardScore === PAIRS[0].score)
-		return { score: (100 + PAIRS[0].score), text: `Pair of ${PAIRS[0].plural}`, value: CARD }
+		return {
+			score: (1000000 + PAIRS[0].score),
+			text: `Pair of ${PAIRS[0].plural}`,
+			value: CARD
+		}
 	}
 
 	// If none of the conditions match, return null
@@ -188,5 +241,9 @@ const checkForHighCard = (hand) => {
         score += card.cardScore
 		if (card.cardScore > highCard.cardScore) highCard = card
 	})
-	return { score: score, text: `${highCard.cardText} High Card`, value: highCard }
+	return {
+		score: score,
+		text: `${highCard.cardText} High Card`,
+		value: highCard
+	}
 }
