@@ -16,9 +16,9 @@
 </script>
 
 <div
-transition:fly={flyParams}
+in:fly={flyParams}
 id="{cardID}"
-class="card {cardSuit} {isSmall ? 'card-small w-16 h-2/3 text-5xl' : 'w-24 h-36 text-6xl'} relative flex justify-center items-center bg-slate-50 rounded-md border-black border-2 shadow-xl font-sans font-bold"
+class="card {cardSuit} {isSmall ? 'card-small w-16 h-24 text-5xl' : 'w-24 h-36 text-6xl'} relative flex justify-center items-center bg-slate-50 rounded-md border-black border-2 shadow-xl font-sans font-bold"
 style="--backgroundImage: url({bgImg})"
 data-score="{cardScore}">
     {cardFace}

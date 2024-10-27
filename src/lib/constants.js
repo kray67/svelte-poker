@@ -19,7 +19,7 @@ export const VALUES = [
 	{ text: 'King', plural: 'Kings', face: 'K', score: 13 },
 	{ text: 'Ace', plural: 'Aces', face: 'A', score: 14 }
 ]
-export const NUMBER_OF_PLAYERS = 8
+export const NUMBER_OF_PLAYERS = 6
 export const CARDS_PER_PLAYER = 2
 
 export const CARD_WIDTH = '6'

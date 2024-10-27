@@ -22,23 +22,21 @@
         }
         if (DRAW_STAGE === 2) {
             burnCard()
-            dealCardToBoard()
-            dealCardToBoard()
-            dealCardToBoard()
+            dealCardsToBoard(3)
             DRAW_STAGE++
             DEAL_TEXT = 'DEAL TURN'
             return
         }
         if (DRAW_STAGE === 3) {
             burnCard()
-            dealCardToBoard()
+            dealCardsToBoard()
             DRAW_STAGE++
             DEAL_TEXT = 'DEAL RIVER'
             return
         }
         if (DRAW_STAGE === 4) {
             burnCard()
-            dealCardToBoard()
+            dealCardsToBoard()
             DRAW_STAGE++
             DEAL_TEXT = 'SHOW RESULTS'
             return
@@ -52,12 +50,18 @@
         }
     }
 
-    const dealCardToBoard = () => {
+    const dealCardsToBoard = (num) => {
+        let CARD_DELAY = 0
         if (BOARD_CARDS.length === 5) return
-        const { selectedCard, newDeck } = getRandomCard(CARD_DECK)
-        BOARD_CARDS.push(selectedCard)
-        BOARD_CARDS = BOARD_CARDS
-        CARD_DECK = newDeck
+        const CARDS_TO_DEAL = num || 1
+        for (let i = 0; i < CARDS_TO_DEAL; i++) {
+            const { selectedCard, newDeck } = getRandomCard(CARD_DECK)
+            selectedCard.delay = CARD_DELAY
+            BOARD_CARDS.push(selectedCard)
+            BOARD_CARDS = BOARD_CARDS
+            CARD_DECK = newDeck
+            CARD_DELAY += 100
+        }
     }
 
     const dealCardsToPlayers = () => {
@@ -71,7 +75,7 @@
                     PLAYERS[i].playerHand.push(selectedCard)
                     PLAYERS[i].playerHand = PLAYERS[i].playerHand
                     CARD_DECK = newDeck
-                    CARD_DELAY = CARD_DELAY + 100
+                    CARD_DELAY += 100
                 }
             }
         }

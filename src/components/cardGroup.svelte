@@ -15,7 +15,7 @@
 class="card-group flex flex-col items-center justify-center gap-3">
     <h1 class="text-xl font-bold">{label}</h1>
     <div
-    class="cards-wrapper h-36 flex items-center justify-start gap-3"
+    class="cards-wrapper { smallCards ? 'h-24' : 'h-36' } flex items-center justify-start gap-3"
     style="width: {WRAPPER_WIDTH}">
         {#each cards as { cardID, cardSuit, cardFace, cardScore, bgImg, delay } (cardID)}
             <Card
@@ -28,9 +28,9 @@ class="card-group flex flex-col items-center justify-center gap-3">
             delay="{delay}" />
         {/each}
     </div>
-    {#if score && score.text}
-        <div class="score">{score.text}</div>
-    {/if}
+    <div class="score text-center text-balance h-12">{score && score.text ? score.text : ''}</div>
+    <!-- {#if score && score.text}
+    {/if} -->
 </div>
 
 <style></style>
