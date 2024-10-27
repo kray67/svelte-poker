@@ -2,10 +2,17 @@ import { VALUES } from "./constants"
 const VALUES_CONST = VALUES
 
 export const getHandScores = (players, board) => {
+	let highScore = 0
 	players.map(player => {
 		const COMPLETE_PLAYER_HAND = player.playerHand.concat(board)
 		const SCORED_PLAYER_HAND = evaluateHand(COMPLETE_PLAYER_HAND)
 		player.playerScore = SCORED_PLAYER_HAND
+		if (player.playerScore.score > highScore) highScore = player.playerScore.score
+	})
+
+	const winners = players.filter((player) => player.playerScore.score === highScore)
+	winners.forEach(player => {
+		player.isWinner = true
 	})
 
 	return players

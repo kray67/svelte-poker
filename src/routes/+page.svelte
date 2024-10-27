@@ -91,7 +91,7 @@
     const buildPlayers = () => {
         for (let index = 1; index <= NUMBER_OF_PLAYERS; index++) {
             PLAYERS.push(
-                { playerID: `PLAYER_${index}`, playerHand: [], playerScore: null }
+                { playerID: `PLAYER_${index}`, playerHand: [], playerScore: null, isWinner: false }
             )
         }
         PLAYERS = PLAYERS
@@ -135,13 +135,14 @@
 
         <!-- PLAYERS -->
         <div class="players-wrapper w-full flex items-center justify-between gap-12">
-            {#each PLAYERS as { playerID, playerHand, playerScore } (playerID)}
+            {#each PLAYERS as { playerID, playerHand, playerScore, isWinner } (playerID)}
                 <CardGroup
                 numberOfCards="{2}"
                 label="{playerID}"
                 cards="{playerHand}"
                 smallCards="{true}"
-                score="{playerScore}" />
+                score="{playerScore}"
+                isWinner="{isWinner}" />
             {/each}
         </div>
     </div>

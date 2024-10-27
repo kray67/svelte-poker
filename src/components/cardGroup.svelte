@@ -1,18 +1,26 @@
 <script>
     import { CARD_WIDTH, CARD_SMALL_WIDTH } from "../lib/constants"
     import Card from '../components/card.svelte'
+    import { fly } from 'svelte/transition'
 
     export let numberOfCards
     export let label
     export let cards
     export let smallCards
     export let score
+    export let isWinner
+
+    const flyParams = {
+        delay: 50,
+        y: 500
+    }
 
     const WRAPPER_WIDTH = `${numberOfCards * (smallCards ? CARD_SMALL_WIDTH : CARD_WIDTH) + ((numberOfCards - 1) * 0.75)}rem`
 </script>
 
 <div
-class="card-group flex flex-col items-center justify-center gap-3">
+class="card-group flex flex-col items-center justify-center gap-3"
+style="width: {WRAPPER_WIDTH}">
     <h1 class="text-xl font-bold">{label}</h1>
     <div
     class="cards-wrapper { smallCards ? 'h-24' : 'h-36' } flex items-center justify-start gap-3"
@@ -29,8 +37,9 @@ class="card-group flex flex-col items-center justify-center gap-3">
         {/each}
     </div>
     <div class="score text-center text-balance h-12">{score && score.text ? score.text : ''}</div>
-    <!-- {#if score && score.text}
-    {/if} -->
+    {#if isWinner}
+        <div in:fly={flyParams} class="winner-text absolute text-2xl font-bold text-yellow-500 -translate-y-32 rotate-3 bg-slate-200 p-2 rounded-lg">WINNER!</div>
+    {/if}
 </div>
 
 <style></style>
