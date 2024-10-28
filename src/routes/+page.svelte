@@ -43,7 +43,6 @@
         }
         if (DRAW_STAGE === 5) {
             const results = getHandScores(PLAYERS, BOARD_CARDS)
-            console.log(results)
             PLAYERS = results
             DRAW_STAGE++
             return

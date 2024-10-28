@@ -7,20 +7,24 @@ export const getHandScores = (players, board) => {
 		const COMPLETE_PLAYER_HAND = player.playerHand.concat(board);
 		const SCORED_PLAYER_HAND = evaluateHand(COMPLETE_PLAYER_HAND);
 
+		// ---------------------------------------------------------
+		// TODO: evaluate each hand's kickers
+		// ---------------------------------------------------------
+
 		// Sort COMPLETE_PLAYER_HAND
-		let SORTED_COMPLETE_PLAYER_HAND = [...new Set(COMPLETE_PLAYER_HAND)].sort((a, b) => b.cardScore - a.cardScore)
+		// const SORTED_COMPLETE_PLAYER_HAND = [...new Set(COMPLETE_PLAYER_HAND)].sort((a, b) => b.cardScore - a.cardScore)
 
-		let PLAYER_SORTED_FINAL_HAND_LENGTH = 0
-		let PLAYER_CARDS_SUMMED_VALUE = 0
-		SORTED_COMPLETE_PLAYER_HAND.forEach((card) => {
-			if (PLAYER_SORTED_FINAL_HAND_LENGTH === 5) return;
-			PLAYER_CARDS_SUMMED_VALUE += card.cardScore;
-			PLAYER_SORTED_FINAL_HAND_LENGTH++;
-		});
+		// let PLAYER_SORTED_FINAL_HAND_LENGTH = 0
+		// let PLAYER_CARDS_SUMMED_VALUE = 0
+		// SORTED_COMPLETE_PLAYER_HAND.forEach((card) => {
+		// 	if (PLAYER_SORTED_FINAL_HAND_LENGTH === 5) return
+		// 	PLAYER_CARDS_SUMMED_VALUE += card.cardScore
+		// 	PLAYER_SORTED_FINAL_HAND_LENGTH++
+		// })
 
-		player.playerScore = SCORED_PLAYER_HAND
-		player.playerScore.score += PLAYER_CARDS_SUMMED_VALUE
-		if (player.playerScore.score > highScore) highScore = player.playerScore.score
+		player.playerScore = SCORED_PLAYER_HAND;
+		// player.playerScore.score += PLAYER_CARDS_SUMMED_VALUE
+		if (player.playerScore.score > highScore) highScore = player.playerScore.score;
 	})
 
 	const winners = players.filter((player) => player.playerScore.score === highScore)
@@ -90,7 +94,7 @@ const checkForFlush = (hand) => {
 			return {
 				score: (5000000 + parseFloat(highCard.cardScore)),
 				text: `${highCard.cardText} High ${suit} Flush`,
-				value: FLUSH_CARDS,
+				cardsToKeep: FLUSH_CARDS,
 				suit: suit
 			}
 		}
@@ -140,7 +144,7 @@ const checkForStraight = (hand) => {
 		return {
 			score: (4000000 + parseFloat(highCard.cardScore)),
 			text: `${highCard.cardText} High Straight`,
-			value: STRAIGHT_CARDS,
+			cardsToKeep: STRAIGHT_CARDS,
 			highCard: highCard
 		}
 	}
@@ -165,10 +169,11 @@ const checkForRepeats = (hand) => {
 	for (const score in CARD_SCORE_COUNT) {
 		if (CARD_SCORE_COUNT[score] === 4) {
 			const CARD = hand.find(card => card.cardScore === parseFloat(score))
+			const CARDS = hand.find((card) => card.cardScore === parseFloat(score))
 			return {
 				score: (7000000 + parseFloat(score)),
 				text: `Four ${CARD.cardPlural}`,
-				value: CARD
+				cardsToKeep: CARDS
 			}
 		}
 	}
@@ -186,18 +191,28 @@ const checkForRepeats = (hand) => {
 	for (const score in CARD_SCORE_COUNT) {
 		if (CARD_SCORE_COUNT[score] === 3) {
 			const CARD = hand.find(card => card.cardScore === parseFloat(score))
+			let CARDS = hand.filter((card) => card.cardScore === parseFloat(score))
 			// check if hand also has a pair and return Full House
 			if (PAIRS.length) {
+				// check if more than one pair and get the highest
+				let highPair = 0
+				PAIRS.forEach(pair => {
+					if (pair.score > highPair) highPair = pair.score 
+				})
+
+				const PAIR_TO_KEEP = PAIRS.find((pair) => pair.score === highPair)
+				hand.filter((card) => card.cardScore === PAIR_TO_KEEP.score).map(card => { CARDS.push(card) })
+
 				return {
-					score: (6000000 + CARD.cardScore + PAIRS[0].score),
+					score: 6000000 + CARD.cardScore + PAIR_TO_KEEP.score,
 					text: `${CARD.cardPlural} Full of ${PAIRS[0].plural}`,
-					value: [CARD, PAIRS[0]]
+					cardsToKeep: CARDS
 				}
 			}
 			return {
 				score: (3000000 + CARD.cardScore),
 				text: `Trip ${CARD.cardPlural}`,
-				value: CARD
+				cardsToKeep: CARDS
 			}
 		}
 	}
@@ -213,20 +228,31 @@ const checkForRepeats = (hand) => {
         for (let i = 0; i < NEW_PAIRS.length; i++) {
 			if (NEW_PAIRS[i].score > secondHighestPair.score) secondHighestPair = NEW_PAIRS[i]
 		}
+
+		const CARDS = []
+		const FIRST_PAIR = hand.filter((card) => card.cardScore === highestPair.score)
+		const SECOND_PAIR = hand.filter((card) => card.cardScore === secondHighestPair.score)
+		FIRST_PAIR.map(card => {
+			CARDS.push(card)
+		})
+		SECOND_PAIR.map((card) => {
+			CARDS.push(card)
+		})
+
 		return {
-			score: (2000000 + highestPair.score + secondHighestPair.score),
+			score: 2000000 + highestPair.score + secondHighestPair.score,
 			text: `Two Pairs: ${highestPair.plural} and ${secondHighestPair.plural}`,
-			values: PAIRS
+			cardsToKeep: CARDS
 		}
 	}
 
 	// If there is one pair, return "One Pair"
 	if (PAIRS.length === 1) {
-		const CARD = hand.find(card => card.cardScore === PAIRS[0].score)
+		const CARDS = hand.filter(card => card.cardScore === PAIRS[0].score)
 		return {
 			score: (1000000 + PAIRS[0].score),
 			text: `Pair of ${PAIRS[0].plural}`,
-			value: CARD
+			cardsToKeep: CARDS
 		}
 	}
 
@@ -235,15 +261,15 @@ const checkForRepeats = (hand) => {
 }
 
 const checkForHighCard = (hand) => {
-	let highCard = { cardScore: 0 }
+	let HIGH_CARD = { cardScore: 0 }
     let score = 0
 	hand.forEach(card => {
         score += card.cardScore
-		if (card.cardScore > highCard.cardScore) highCard = card
+		if (card.cardScore > HIGH_CARD.cardScore) HIGH_CARD = card
 	})
 	return {
 		score: score,
-		text: `${highCard.cardText} High Card`,
-		value: highCard
+		text: `${HIGH_CARD.cardText} High Card`,
+		cardsToKeep: [HIGH_CARD]
 	}
 }
