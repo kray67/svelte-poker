@@ -110,11 +110,7 @@ const checkForFlush = (hand) => {
 			// While more than 5 cards, remove the lowest card
 			while (FLUSH_CARDS.length > 5) FLUSH_CARDS.pop()
 			// Get high card
-			let highCard = { cardScore: 0 }
-			FLUSH_CARDS.forEach((card) => {
-				if (FLUSH_CARDS.length === 5) return
-				if (card.cardScore > highCard.cardScore) highCard = card
-			})
+			let highCard = FLUSH_CARDS[0]
 
 			return {
 				score: 5000000 + parseFloat(highCard.cardScore),
