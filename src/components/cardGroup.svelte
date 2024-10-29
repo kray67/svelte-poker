@@ -7,8 +7,8 @@
     export let label
     export let cards
     export let smallCards
-    export let score
-    export let isWinner
+    export let score = null
+    export let isWinner = null
 
     const flyParams = {
         delay: 50,
