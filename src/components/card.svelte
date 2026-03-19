@@ -1,20 +1,33 @@
 <script>
     import { fly } from 'svelte/transition'
 
-    export let cardID
-    export let cardFace
-    export let cardSuit
-    export let cardScore
-    export let bgImg
-    export let isSmall
-    export let delay
+    // ---------------------------------------------------------------------------
+    // Props — all required, passed down from CardGroup
+    // ---------------------------------------------------------------------------
+    export let cardID     // Unique identifier string, e.g. "A_SPADES"
+    export let cardFace   // Rank character displayed on the card, e.g. "A", "10", "K"
+    export let cardSuit   // Suit string, also used as a CSS class, e.g. "SPADES"
+    export let cardScore  // Numeric rank score (2000–14000); stored on data-score for debugging
+    export let bgImg      // Path to the suit icon PNG, passed to the CSS custom property
+    export let isSmall    // true → player hand (small), false → board (full-size)
+    export let delay      // Animation delay in ms; staggered per card to create a dealing effect
 
+    // Fly transition: cards animate up from below the viewport, staggered by `delay`
     const flyParams = {
         delay: delay,
         y: 500
     }
 </script>
 
+<!--
+    The suit icon is rendered via CSS ::before (top-left) and ::after (bottom-right)
+    pseudo-elements using a CSS custom property (--backgroundImage). This avoids
+    needing an <img> tag inside the card and keeps the markup minimal.
+
+    Tailwind classes switch between two size presets:
+      - Full-size (board): w-24 h-36 text-6xl
+      - Small (player hand): w-16 h-24 text-5xl (card-small)
+-->
 <div
 in:fly={flyParams}
 id="{cardID}"
@@ -25,6 +38,11 @@ data-score="{cardScore}">
 </div>
 
 <style>
+    /*
+     * Suit icons are placed at the top-left (::before) and bottom-right (::after)
+     * corners of every card using the --backgroundImage CSS custom property
+     * injected from the Svelte style attribute above.
+     */
     .card::before,
     .card::after {
         content: '';
@@ -48,6 +66,7 @@ data-score="{cardScore}">
         right: 0.5rem;
     }
 
+    /* Smaller icon positions for player hand cards */
     .card-small::before,
     .card-small::after {
         width: 1.15rem;
